@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COGITO ERGO SUM - Silent Breach</title>
+
+<!--
+COGITO ERGO SUM - Silent Breach
+Arquivo exemplo comentado.
+
+INSTRUÇÕES:
+1. Coloque seu vídeo na mesma pasta com o nome: video.mp4
+2. Cole seu ASCII dentro da div #logo.
+3. Abra o index.html no navegador.
+-->
+
+<style>
+body{
+    margin:0;
+    background:#000;
+    color:#00ff00;
+    font-family:Consolas, monospace;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+#terminal{
+    max-width:95%;
+    z-index:2;
+}
+
+#logo{
+    white-space:pre;
+    font-size:.35rem;
+    line-height:1;
+    margin-bottom:20px;
+    text-shadow:0 0 5px #00ff00,0 0 10px #00ff00;
+}
+
+@media(min-width:768px){
+    #logo{font-size:.55rem;}
+}
+
+#content{
+    text-shadow:0 0 5px #00ff00,0 0 10px #00ff00;
+}
+
+.cursor{
+    animation:blink 1s infinite;
+}
+
+@keyframes blink{
+    50%{opacity:0;}
+}
+
+button{
+    margin-top:20px;
+    padding:12px 24px;
+    background:black;
+    color:#00ff00;
+    border:1px solid #00ff00;
+    cursor:pointer;
+}
+
+#progressContainer{
+    display:none;
+    margin-top:15px;
+}
+
+#progressBar{
+    width:300px;
+    max-width:80vw;
+    height:16px;
+    border:1px solid #00ff00;
+}
+
+#progressFill{
+    width:0%;
+    height:100%;
+    background:#00ff00;
+}
+
+video{
+    display:none;
+    width:100vw;
+    height:100vh;
+    object-fit:cover;
+}
+
+#final{
+    display:none;
+    text-shadow:0 0 10px #00ff00;
+}
+
+canvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    opacity:.18;
+}
+
+.flash{
+    position:fixed;
+    inset:0;
+    background:white;
+    opacity:0;
+    pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div id="terminal">
+<div id="logo">
+░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓██████▓▒░       ░▒▓████████▓▒░▒▓███████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░        ░▒▓███████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓██████████████▓▒░  
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓██████▓▒░ ░▒▓███████▓▒░░▒▓█▓▒▒▓███▓▒░▒▓█▓▒░░▒▓█▓▒░       ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+ ░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓██████▓▒░       ░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░ ░▒▓██████▓▒░       ░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░
+</div>
+
+<div id="content"></div>
+<span class="cursor">_</span>
+
+<div id="progressContainer">
+<div id="progressBar">
+<div id="progressFill"></div>
+</div>
+</div>
+</div>
+
+<video id="video" controls>
+<source src="video.mp4" type="video/mp4">
+</video>
+
+<div id="final">
+<h2>TRANSMISSION COMPLETE</h2>
+<p>COGITO ERGO SUM<br>Silent Breach</p>
+</div>
+
+<div id="flash" class="flash"></div>
+
+<script>
+const content = document.getElementById("content");
+
+const lines = [
+"COGITO NETWORK v1.0",
+"",
+"INITIALIZING CORE...",
+"LOADING MEMORY...",
+"VERIFYING NODE...",
+"SCANNING SIGNAL...",
+"AUTHENTICATING...",
+"",
+"SIGNAL DETECTED",
+"TRANSMISSION FOUND",
+"STATUS: ONLINE"
+];
+
+let lineIndex = 0;
+
+function typeText(text, cb){
+    let i = 0;
+    const span = document.createElement("div");
+
+    function write(){
+        if(i < text.length){
+            span.textContent += text[i++];
+            setTimeout(write, 25);
+        }else{
+            content.appendChild(span);
+            cb && cb();
+        }
+    }
+
+    content.appendChild(span);
+    write();
+}
+
+function nextLine(){
+    if(lineIndex < lines.length){
+        typeText(lines[lineIndex], () => {
+            lineIndex++;
+            setTimeout(nextLine, 300);
+        });
+    }else{
+        startProgress();
+    }
+}
+
+function startProgress(){
+    document.getElementById("progressContainer").style.display = "block";
+
+    let p = 0;
+    const fill = document.getElementById("progressFill");
+
+    const timer = setInterval(() => {
+        p += 2;
+        fill.style.width = p + "%";
+
+        if(p >= 100){
+            clearInterval(timer);
+
+            content.innerHTML += "<br>";
+            content.innerHTML += '<button onclick="startTransmission()">[ INICIAR TRANSMISSÃO ]</button>';
+        }
+    },40);
+}
+
+async function startTransmission(){
+    document.getElementById("terminal").style.display = "none";
+
+    const video = document.getElementById("video");
+    video.style.display = "block";
+
+    try{
+        await document.documentElement.requestFullscreen();
+    }catch(e){}
+
+    video.play();
+
+    video.onended = () => {
+        video.style.display = "none";
+        document.getElementById("final").style.display = "block";
+    };
+}
+
+nextLine();
+
+setInterval(()=>{
+    if(Math.random() < 0.12){
+        document.body.style.transform =
+            `translate(${Math.random()*4-2}px,${Math.random()*4-2}px)`;
+
+        setTimeout(()=>{
+            document.body.style.transform = "translate(0,0)";
+        },80);
+    }
+},500);
+
+// Matrix simples
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+}
+resize();
+addEventListener("resize", resize);
+
+const cols = Math.floor(window.innerWidth / 20);
+const drops = Array(cols).fill(1);
+
+function draw(){
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "#00ff00";
+    ctx.font = "15px monospace";
+
+    drops.forEach((y,i)=>{
+        const txt = String.fromCharCode(0x30A0 + Math.random()*96);
+        ctx.fillText(txt, i*20, y*20);
+
+        if(y*20 > canvas.height && Math.random() > 0.975){
+            drops[i] = 0;
+        }
+
+        drops[i]++;
+    });
+}
+
+setInterval(draw, 50);
+</script>
+
+</body>
+</html>
